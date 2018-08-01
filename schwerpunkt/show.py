@@ -41,7 +41,7 @@ def gen_palette(data):
     rv = {}
     for i, tag in enumerate(sorted(alltags)):
         rv[tag] = colors[i % len(colors)]
-    rv['Podcasts'] = "#CFCFCF"
+    rv['Podcasts'] = "#fefefe"
     return rv
 
 def gen_cols(data):

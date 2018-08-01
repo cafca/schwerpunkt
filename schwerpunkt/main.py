@@ -64,7 +64,7 @@ if __name__ == '__main__':
             }
 
             with open('data.json', 'w') as f:
-                json.dump(store, f, indent=2, ensure_ascii=False)
+                json.dump(store, f, indent=2, ensure_ascii=False, sort_keys=True)
             logging.info("Inserted new tags: {}".format(", ".join(new_data)))
         else:
             logging.debug("No new tags")

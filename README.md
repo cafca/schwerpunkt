@@ -11,5 +11,5 @@ Folgenden Cronjob mit `crontab -e` erstellen um das Skript jede Stunde auszufüh
 (Pfade anpassen).
 
 ```bash
-0 * * * * /Users/pv/projects/schwerpunkt/bin/python /Users/pv/projects/schwerpunkt/src/schwerpunkt/main.py >> /Users/pv/projects/schwerpunkt/cron.log 2>&1
+0 * * * * schwerpunkt/venv/bin/python schwerpunkt/src/schwerpunkt/main.py >> schwerpunkt/cron.log 2>&1
 ```

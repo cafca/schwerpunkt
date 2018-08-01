@@ -111,6 +111,11 @@ def make_html(data, links):
     <html>
     <head>
         <meta charset="utf-8"/>
+        <title>Schwerpunkte der Zeit</title>
+        <meta name="description" content="Auf Zeit.de werden stets drei Schwerpunkt-Themen benannt, die gerade
+            die Nachrichten bestimmen. Diese Seite zeigt eine laufende Chronologie dieser 
+            Schwerpunkte und beginnt dabei tief im Sommerloch...">
+        <meta property="og:image" content="http://zeit.001.land/screen.png"/>  
         <link rel='stylesheet' href='reset.css' />
         <link rel='stylesheet' href='styles.css' />
     </head>

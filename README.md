@@ -3,7 +3,7 @@
 Erfasst regelmäßig die Schwerpunkt-Themen auf Zeit-Online um eine visuelle 
 Timeline als HTML-Datei zu erstellen.
 
-![](screen.png)
+![](out/screen.png)
 
 ## Setup
 

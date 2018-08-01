@@ -9,7 +9,7 @@ def setup_logging():
     logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name).24s %(levelname)-8s %(message)s',
                     datefmt='%m-%d %H:%M',
-                    filename='schwerpunkt.log')
+                    filename='/Users/pv/projects/schwerpunkt/src/schwerpunkt.log')
 
 def get_html():
     url = "https://www.zeit.de/index"
@@ -36,7 +36,7 @@ def are_tags_changed(new_data, old_data):
 if __name__ == '__main__':
     setup_logging()
 
-    with open('data.json') as f:
+    with open('/Users/pv/projects/schwerpunkt/src/data.json') as f:
         data = json.load(f) 
         logging.debug("Loaded {} datasets".format(len(data.keys())))
     
@@ -50,7 +50,7 @@ if __name__ == '__main__':
         if are_tags_changed(new_data, data):
             data[timestamp()] = new_data
 
-            with open('data.json', 'w') as f:
+            with open('/Users/pv/projects/schwerpunkt/src/data.json', 'w') as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
             logging.info("Inserted new tags: {}".format(", ".join(new_data)))
         else:

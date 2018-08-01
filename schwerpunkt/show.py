@@ -162,7 +162,7 @@ def make_html(data, links):
                 color=palette[entry[0]]
             )
 
-    beginning = dateutil.parser.parse(list(data.keys())[0])
+    beginning = dateutil.parser.parse(sorted(data.keys())[0])
     days = (datetime.now() - beginning).total_seconds() / (60 * 60 * 24)
     for i in range(round(days)):
         day = beginning + timedelta(days=i)

@@ -106,6 +106,7 @@ def make_html(data, links):
     out_template = """
     <html>
     <head>
+        <meta charset="utf-8"/>
         <link rel='stylesheet' href='styles.css' />
     </head>
     <body>

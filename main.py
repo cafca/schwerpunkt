@@ -3,6 +3,7 @@ import json
 import datetime
 import logging
 from bs4 import BeautifulSoup
+from show import make_html
 
 
 def setup_logging():
@@ -22,8 +23,12 @@ def extract_tags(html):
 def timestamp():
     return datetime.datetime.now().isoformat()
 
-def tags_as_text(tags):
-    return sorted([tag.text.strip() for tag in tags])
+def tags_to_text(tags):
+    links = {}
+    for tag_elem in tags:
+        tag = tag_elem.text.strip()
+        links[tag] = tag_elem.attrs['href']
+    return (sorted([tag.text.strip() for tag in tags]), links)
 
 def are_tags_changed(new_data, old_data):
     if len(old_data.keys()) == 0:
@@ -37,21 +42,34 @@ if __name__ == '__main__':
     setup_logging()
 
     with open('/Users/pv/projects/schwerpunkt/src/data.json') as f:
-        data = json.load(f) 
-        logging.debug("Loaded {} datasets".format(len(data.keys())))
+        store = json.load(f) 
+        data = store['data']
+        links = store['links']
+        logging.debug("Loaded {} datasets and {} links".format(
+            len(data.keys()), len(links.keys())))
     
     try:
         html = get_html()
         tags = extract_tags(html)
-        new_data = tags_as_text(tags)
+        new_data, new_links = tags_to_text(tags)
     except Exception as e:
         logging.error("Error extracting: {}".format(e))
     else:
         if are_tags_changed(new_data, data):
             data[timestamp()] = new_data
+            links.update(new_links)
+            store = {
+                'data': data,
+                'links': links
+            }
 
             with open('/Users/pv/projects/schwerpunkt/src/data.json', 'w') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
+                json.dump(store, f, indent=2, ensure_ascii=False)
             logging.info("Inserted new tags: {}".format(", ".join(new_data)))
         else:
             logging.debug("No new tags")
+    
+
+    html = make_html(data, links)
+    with open('out/index.html', 'w') as f:
+        f.write(html)

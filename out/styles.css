@@ -1,6 +1,37 @@
+
 body {
-  display: flex;
   font-family: Futura;
+  padding-top: 8px;
+}
+
+.intro {
+  text-align: center;
+  margin: 2em auto .5em;
+  width: 30em;
+}
+
+h1 {
+  text-align: left;
+  font-size: 2em;
+}
+
+p {
+  text-align: left;
+  margin: 3em auto 5em;
+  width: 30em;
+  line-height: 1.4em;
+}
+
+.content {
+  display: flex;
+}
+
+.content a {
+  color: black;
+  text-decoration: none;
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
 }
 
 .flex-container {
@@ -13,11 +44,11 @@ body {
 .day, .flex-container > div {
   display: flex;
   margin: 0 8px 0 0; /* Some gutter */
-  padding: 0 0 0 8px;
 }
 
 .day {
-  padding: 0;
+  text-align: right;
+  padding: 0 0 0 8px;
   margin: 0;
-  min-height: 72px;
+  min-height: 60px;
 }

@@ -6,6 +6,10 @@ from datetime import datetime, timedelta
 colors = ["#A1C9F4", "#FFB482", "#8DE5A1", "#FF9F9B", "#D0BBFF",
             "#DEBB9B", "#FAB0E4", "#FFFEA3", "#B9F2F0"]
 
+# colors = ['7BA1C6','7B87C6','877BC6','A17BC6','BA7BC6','C67BA1','C67B87','C6877B','C6A17B']
+
+SCALE_FACTOR = 2.5
+
 def print_logs(data):
     for key in sorted(data.keys()):
         dt = dateutil.parser.parse(key)
@@ -87,7 +91,7 @@ def gen_cols(data):
             delta = entry[2] - entry[1]
         except TypeError:
             delta = datetime.now() - entry[1]
-        delta_total = 3 * delta.total_seconds() / (60 * 60)
+        delta_total = SCALE_FACTOR * delta.total_seconds() / (60 * 60)
         return (entry[0], delta_total)
 
     # extend current tags to the end
@@ -107,23 +111,33 @@ def make_html(data, links):
     <html>
     <head>
         <meta charset="utf-8"/>
+        <link rel='stylesheet' href='reset.css' />
         <link rel='stylesheet' href='styles.css' />
     </head>
     <body>
-        <div class='index' style='width: 10%'>
-            {col0}
+        <div class='intro'>
+            <h1>Schwerpunkte der Zeit</h1>
+            <p>Auf Zeit.de werden stets drei Schwerpunkt-Themen benannt, die gerade
+            die Nachrichten bestimmen. Diese Seite zeigt eine laufende Chronologie dieser 
+            Schwerpunkte und beginnt dabei tief im Sommerloch...
+            </p>
         </div>
+        <div class='content'>
+            <div class='index' style='width: 10%'>
+                {col0}
+            </div>
 
-        <div class='flex-container'>
-            {col1}
-        </div>
+            <div class='flex-container'>
+                {col1}
+            </div>
 
-        <div class='flex-container'>
-            {col2}
-        </div>
+            <div class='flex-container'>
+                {col2}
+            </div>
 
-        <div class='flex-container'>
-            {col3}
+            <div class='flex-container'>
+                {col3}
+            </div>
         </div>
 
     </body>
@@ -137,11 +151,11 @@ def make_html(data, links):
     html = ["" for i in range(4)]
     for i, col in enumerate(cols):
         for entry in col:
-            tag = entry[0]
-            if tag in links:
-                tag = "<a href='{}'>{}</a>".format(links[tag], tag)
-            if tag == 'Podcasts':
+            if entry[0] == 'Podcasts':
                 tag = ''
+            else:
+                tag = "<a href='{}'>{}</a>".format(
+                    links[entry[0]] if entry[0] in links else '', entry[0])
             html[i + 1] += elem_template.format(
                 tag=tag, 
                 height=entry[1],
@@ -156,9 +170,6 @@ def make_html(data, links):
             day.strftime("%d.%m"))
 
     return out_template.format(col0=html[0], col1=html[1], col2=html[2], col3=html[3])
-
-
-
 
 
 if __name__ == '__main__':

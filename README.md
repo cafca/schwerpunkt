@@ -3,13 +3,19 @@
 Erfasst regelmäßig die Schwerpunkt-Themen auf Zeit-Online um eine visuelle 
 Timeline als HTML-Datei zu erstellen.
 
+![](screen.png)
+
 ## Setup
 
-```pip install -r requirements.txt```
+Virtualenv mit Python3 erstellen und
 
-Folgenden Cronjob mit `crontab -e` erstellen um das Skript jede Stunde auszuführen 
+```bash
+pip install -r requirements.txt
+```
+
+Dann olgenden Cronjob mit `crontab -e` erstellen um das Skript jede Stunde auszuführen 
 (Pfade anpassen).
 
 ```bash
-0 * * * * schwerpunkt/venv/bin/python schwerpunkt/src/schwerpunkt/main.py >> schwerpunkt/cron.log 2>&1
+0 * * * * cd schwerpunkt && venv/bin/python schwerpunkt/main.py >> cron.log 2>&1
 ```

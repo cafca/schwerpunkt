@@ -34,7 +34,7 @@ def are_tags_changed(new_data, old_data):
     if len(old_data.keys()) == 0:
         return True
     else:
-        last_entry = old_data[list(old_data.keys())[-1]]
+        last_entry = old_data[sorted(old_data.keys())[-1]]
         return set(last_entry) != set(new_data)
 
 

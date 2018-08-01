@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 colors = ["#A1C9F4", "#FFB482", "#8DE5A1", "#FF9F9B", "#D0BBFF",
             "#DEBB9B", "#FAB0E4", "#FFFEA3", "#B9F2F0"]
 
-# colors = ['7BA1C6','7B87C6','877BC6','A17BC6','BA7BC6','C67BA1','C67B87','C6877B','C6A17B']
+colors = ['7BA1C6','7B87C6','877BC6','A17BC6','BA7BC6','C67BA1','C67B87','C6877B','C6A17B']
 
 SCALE_FACTOR = 2.5
 
@@ -139,6 +139,7 @@ def make_html(data, links):
                 {col3}
             </div>
         </div>
+        <p>Ein Projekt von <a href='https://vincentahrend.com'>Vincent Ahrend</a>. Kontakt über <a href='mailto:zeit-schwerpunkt@vincentahrend.com'>Email</a> oder <a href='http://telegram.me/ululu'>Telegram</a>. <a href='https://blog.vincentahrend.com/impressum/'>Impressum</a></p>
 
     </body>
     </html>

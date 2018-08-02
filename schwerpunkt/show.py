@@ -1,4 +1,5 @@
 import json
+import logging
 import operator
 import dateutil.parser
 from datetime import datetime, timedelta
@@ -9,6 +10,11 @@ colors = ["#A1C9F4", "#FFB482", "#8DE5A1", "#FF9F9B", "#D0BBFF",
 colors = ['7BA1C6','7B87C6','877BC6','A17BC6','BA7BC6','C67BA1','C67B87','C6877B','C6A17B']
 
 SCALE_FACTOR = 2.5
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(name).24s %(levelname)-8s %(message)s',
+                    datefmt='%m-%d %H:%M',
+                    filename='schwerpunkt.log')
 
 def print_logs(data):
     for key in sorted(data.keys()):
@@ -45,68 +51,74 @@ def gen_palette(data):
     return rv
 
 def gen_cols(data):
+    # Distribute tags on three columns, making sure that repeating tags
+    # are represented as a continuous block
+
+    # Each column is represented as a list of 3-tuples, each of which contains
+    # a tag name, starting datetime and ending datetime
     cols = [[], [], []]
+
+    # This is to keep track of tags that may continue on the column they started
+    # on
     current_start = {}
+
     for dtstring in sorted(data.keys()):
-        # print('\n\n' + dtstring)
-        # print(data[dtstring])
+        # dtstring is iso-8601 formatted
         dt = dateutil.parser.parse(dtstring)
 
+        # If a tag from the previous set is not in the current tagset: remove
+        # from current_start and update ending time to => dt
         for tag in list(current_start.keys()):
             col, pos = current_start[tag]
             if tag not in data[dtstring]:
                 cols[col][pos][2] = dt
                 del current_start[tag]
-                # print('end ' + tag)
 
         for i, tag in enumerate(data[dtstring]):
-            # print(tag)
-            # if tag == 'Atomabkommen':
-            #     import pdb; pdb.set_trace()
+            logging.debug(tag)
+
             if tag in current_start.keys():
                 col, pos = current_start[tag]
                 cols[col][pos][2] = dt
-                # print('cont in {}'.format(col))
             else:
+                # Determine a column for inserting if this tag is not cont.
+                # from before. This is, well, clumsy. But I'm tired and it works.
                 if len(cols[i]) == 0 or cols[i][-1][0] not in data[dtstring]:
                     j = i
-                    # print("insert {}".format(j % 3))
+                    logging.debug("insert {}".format(j % 3))
                 else:
                     j = (i + 1) % 3
-                    if len(cols[j]) == 0 or cols[j][-1][0] not in data[dtstring]:
-                        # print("insert {} because {} is taken".format(j, i))
-                        pass
-                    else:
+                    if len(cols[j]) != 0 and cols[j][-1][0] in data[dtstring]:
                         j = (j + 1) % 3
-                        # print("insert {} because {} and {} is taken".format(j, i % 3, (i + 1) % 3))
                 j = j % 3
                 current_start[tag] = [j, len(cols[j])]
                 cols[j].append([tag, dt, None])
 
         prev = data[dtstring]
 
+    # Extend last tags in each column to the end
+    for i in range(3):
+        cols[i][-1][2] = datetime.now()
 
-    def dist(entry):
+    # Now the starting and ending datetime can be converted to a height
+    # for css styling by calculating their delta
+    def height(entry):
         try:
             delta = entry[2] - entry[1]
         except TypeError:
             delta = datetime.now() - entry[1]
-        delta_total = SCALE_FACTOR * delta.total_seconds() / (60 * 60)
-        return (entry[0], delta_total)
+        rv = SCALE_FACTOR * delta.total_seconds() / (60 * 60)
+        return (entry[0], rv)
 
-    # extend current tags to the end
-    for i in range(3):
-        cols[i][-1][2] = datetime.now()
+    cols = [list(map(height, col)) for col in cols]
 
-    cols = [list(map(dist, col)) for col in cols]
-
-    
     # print(json.dumps(cols, indent=2, ensure_ascii=False))
     return cols
 
 def make_html(data, links):
     cols = gen_cols(data)
     palette = gen_palette(data)
+
     out_template = """
     <html>
     <head>
@@ -144,8 +156,11 @@ def make_html(data, links):
                 {col3}
             </div>
         </div>
-        <p>Ein Projekt von <a href='https://vincentahrend.com'>Vincent Ahrend</a>. Kontakt über <a href='mailto:zeit-schwerpunkt@vincentahrend.com'>Email</a> oder <a href='http://telegram.me/ululu'>Telegram</a>. <a href='https://blog.vincentahrend.com/impressum/'>Impressum</a></p>
 
+        <p>Ein Projekt von <a href='https://vincentahrend.com'>Vincent Ahrend</a>. 
+        Kontakt über <a href='mailto:zeit-schwerpunkt@vincentahrend.com'>Email</a> 
+        oder <a href='http://telegram.me/ululu'>Telegram</a>. 
+        <a href='https://blog.vincentahrend.com/impressum/'>Impressum</a></p>
     </body>
     </html>
     """
@@ -168,14 +183,17 @@ def make_html(data, links):
                 color=palette[entry[0]]
             )
 
-    beginning = dateutil.parser.parse(sorted(data.keys())[0])
+    beginning = dateutil.parser \
+        .parse(sorted(data.keys())[0]) \
+        .replace(hour=0, minute=0, second=0)
     days = (datetime.now() - beginning).total_seconds() / (60 * 60 * 24)
     for i in range(round(days)):
         day = beginning + timedelta(days=i)
         html[0] += "<div class='day'>{}</div>".format(
             day.strftime("%d.%m"))
 
-    return out_template.format(col0=html[0], col1=html[1], col2=html[2], col3=html[3])
+    return out_template.format(
+        col0=html[0], col1=html[1], col2=html[2], col3=html[3])
 
 
 if __name__ == '__main__':

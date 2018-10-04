@@ -7,6 +7,9 @@ from main import tags_to_text, extract_tags, setup_logging, are_tags_changed
 
 WAYBACK_FOLDER = "../wayback/websites/zeit.de/"
 
+FROM = '2017-11-16'
+TO = None
+
 
 def file_list(root):
     # Return a listing of all archived index.html files in a folder
@@ -45,6 +48,10 @@ if __name__ == "__main__":
             len(data.keys()), len(links.keys())))
 
     for ts, fn in list(file_list.items()):
+        if (FROM is not None and ts < FROM) or (TO is not None and ts > TO):
+            logging.debug('Skipping {}'.format(ts))
+            continue
+
         with open(fn) as f:
             try:
                 html = f.read()
@@ -54,6 +61,9 @@ if __name__ == "__main__":
         new_data, new_links = tags_to_text(tags)
 
         if are_tags_changed(new_data, data):
+            if len(new_data) != 3:
+                logging.error('Dataset with more than 3 tags: {}'.format(
+                    str(new_data)))
             data[timestamp(ts)] = new_data
             links.update(new_links)
             store = {

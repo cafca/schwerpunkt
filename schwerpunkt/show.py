@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import json
 import logging
 import operator
@@ -9,9 +11,12 @@ colors = ["#A1C9F4", "#FFB482", "#8DE5A1", "#FF9F9B", "#D0BBFF",
 
 colors = ['7BA1C6','7B87C6','877BC6','A17BC6','BA7BC6','C67BA1','C67B87','C6877B','C6A17B']
 
+# Non-Topics and Zeit Online-specific topics
+blocklist = ['Podcasts', '#D17', 'D17', '70 Jahre Zeit', 'Zeit-Mathetest', 'Drogenumfrage 2016']
+
 SCALE_FACTOR = 2.5
 
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(name).24s %(levelname)-8s %(message)s',
                     datefmt='%m-%d %H:%M',
                     filename='schwerpunkt.log')
@@ -47,7 +52,8 @@ def gen_palette(data):
     rv = {}
     for i, tag in enumerate(sorted(alltags)):
         rv[tag] = colors[i % len(colors)]
-    rv['Podcasts'] = "#fefefe"
+    for tag in blocklist:
+        rv[tag] = 'FEFEFE'
     return rv
 
 def gen_cols(data):
@@ -160,7 +166,8 @@ def make_html(data, links):
         <p>Ein Projekt von <a href='https://vincentahrend.com'>Vincent Ahrend</a>. 
         Kontakt über <a href='mailto:zeit-schwerpunkt@vincentahrend.com'>Email</a> 
         oder <a href='http://telegram.me/ululu'>Telegram</a>. 
-        <a href='https://blog.vincentahrend.com/impressum/'>Impressum</a></p>
+        <a href='https://blog.vincentahrend.com/impressum/'>Impressum</a>
+        <a href='https://github.com/ciex/schwerpunkt'>Quellcode</a></p>
     </body>
     </html>
     """
@@ -172,7 +179,7 @@ def make_html(data, links):
     html = ["" for i in range(4)]
     for i, col in enumerate(cols):
         for entry in col:
-            if entry[0] == 'Podcasts':
+            if entry[0] in blocklist:
                 tag = ''
             else:
                 tag = "<a href='{}'>{}</a>".format(
@@ -190,7 +197,7 @@ def make_html(data, links):
     for i in range(round(days)):
         day = beginning + timedelta(days=i)
         html[0] += "<div class='day'>{}</div>".format(
-            day.strftime("%d.%m"))
+            day.strftime("%d.%m.%y"))
 
     return out_template.format(
         col0=html[0], col1=html[1], col2=html[2], col3=html[3])
@@ -205,5 +212,5 @@ if __name__ == '__main__':
     print_logs(data)
     
     html = make_html(data, links)
-    with open('out/index1.html', 'w') as f:
+    with open('out/index.html', 'w') as f:
         f.write(html)

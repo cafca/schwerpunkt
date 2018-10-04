@@ -18,7 +18,7 @@ def get_html():
     return response.content
 
 def extract_tags(html):
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, 'lxml')
     tags = soup.find_all('a', class_='nav__tag')
 
     # legacy zeit online design
@@ -40,7 +40,8 @@ def tags_to_text(tags):
     for tag_elem in tags:
         tag = tag_elem.text.strip()
         links[tag] = tag_elem.attrs['href']
-    return (sorted([tag.text.strip() for tag in tags]), links)
+    tags = sorted(list(set([tag.text.strip() for tag in tags])))
+    return (tags, links)
 
 def are_tags_changed(new_data, old_data):
     if len(new_data) == 0:

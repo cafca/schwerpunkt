@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import requests
 import json
 import datetime
@@ -17,7 +19,7 @@ def get_html():
     return requests.get(url)
 
 def extract_tags(html):
-    soup = BeautifulSoup(html.content, 'html.parser')
+    soup = BeautifulSoup(html.content, 'lxml')
     return soup.find_all('a', class_='nav__tag')
 
 def timestamp():
@@ -28,7 +30,8 @@ def tags_to_text(tags):
     for tag_elem in tags:
         tag = tag_elem.text.strip()
         links[tag] = tag_elem.attrs['href']
-    return (sorted([tag.text.strip() for tag in tags]), links)
+    tags = sorted(list(set([tag.text.strip() for tag in tags])))
+    return (tags, links)
 
 def are_tags_changed(new_data, old_data):
     if len(old_data.keys()) == 0:
